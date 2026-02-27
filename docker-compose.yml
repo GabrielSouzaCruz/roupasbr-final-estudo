@@ -1,0 +1,46 @@
+﻿version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: roupasbr_backend
+    restart: unless-stopped
+    volumes:
+      - ./backend:/var/www/html
+    depends_on:
+      - db
+      - redis
+
+  frontend:
+    build: ./frontend
+    container_name: roupasbr_frontend
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:8000
+
+  db:
+    image: mysql:8.0
+    container_name: roupasbr_db
+    environment:
+      MYSQL_DATABASE: roupasbr
+      MYSQL_USER: roupasbr
+      MYSQL_PASSWORD: securepass2026
+      MYSQL_ROOT_PASSWORD: rootsecure2026
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  redis:
+    image: redis:alpine
+    container_name: roupasbr_redis
+    volumes:
+      - redis_data:/data
+
+networks:
+  default:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  redis_data:
